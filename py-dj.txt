@@ -1,0 +1,365 @@
+://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+
+#!/bin/sh
+curl -L https://us-west-2-aws-training.s3.amazonaws.com/awsu-spl/spl03-working-elb/static/bootstrap-elb.sh|sh
+
+
+ec2-18-223-166-109.us-east-2.compute.amazonaws.com
+
+https://chat.whatsapp.com/FGVMuchmQNmKysoh7omBcv
+
+
+https://aws.amazon.com/premiumsupport/knowledge-center/start-stop-lambda-cloudwatch/
+
+
+
+
+
+
+
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html
+    
+https://www.bogotobogo.com/DevOps/AWS/aws_creating_an_instance_and_attaching_Amazon_EBS_volume_to_that_instance_bogo_Python_module.php
+    
+    
+    
+#!/bin/sh
+curl -L https://us-west-2-aws-training.s3.amazonaws.com/awsu-spl/spl03-working-elb/static/bootstrap-elb.sh|sh
+
+    
+#!/bin/sh
+
+yum -y install httpd php
+chkconfig httpd on
+/etc/init.d/httpd start
+cd /var/www/html
+wget https://us-west-2-aws-training.s3.amazonaws.com/awsu-spl/spl03-working-elb/static/examplefiles-elb.zip
+unzip examplefiles-elb.zip
+
+#!/usr/bin/ python
+import boto3
+ec2 = boto3.resource('ec2')
+for instance in ec2.instances.all():
+    print instance.id, instance.state
+    
+
+mkdir -p ~/.aws/
+    
+vi ~/.aws/credentials
+
+[default]
+aws_access_key_id = your_key_id
+aws_secret_access_key = your_access_key
+output = json
+region = eu-west-1
+    
+    
+----------------------Ansible-------------------------------
+1. Create a new file called 'ansible.repo' in 
+cd /etc/yum.repos.d
+vi ansible.repo
+
+2. Copy the following content into it:
+[Ansible]
+name = ansible
+baseurl = https://releases.ansible.com/ansible/rpm/release/epel-7-x86_64/
+enabled = 1
+gpgcheck = 0 
+3. Run 'yum update' 
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+yum -y install ansible
+
+ansible --version
+ 
+vi
+https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+    
+vi /etc/ansible/hosts  
+ shift + g
+ i
+[all]
+172.31.1.2 ansible_ssh_private_key_file=/root/.ssh/server1.pem ansible_ssh_user=ec2-user
+
+vi /root/.ssh/server1.pem
+chmod 400 /root/.ssh/server1.pem
+
+ansible -m ping all
+ansible all -m raw -a 'sudo uptime'
+ansible all -m raw -a "echo $SHELL"
+
+
+-24/11----------------------
+
+#Login as root on Ansible controller
+
+#mkdir -p /opt/ansible-demo
+
+#cd /opt/ansible-demo
+
+#vi sshcopy.yml
+vi sshcopy.yml
+
+---
+- hosts: all
+
+  tasks:
+    - name: Execute SSH-keygen
+      command: ssh-keygen -y -t rsa -f /root/.ssh/id_rsa -N ''
+      args:
+        creates: /root/.ssh/id_rsa
+      delegate_to: localhost
+
+    - name: Set Authorized key token from file
+      become: true
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+        
+        
+        syntax-check:
+        -------------
+        ansible-playbook sshcopy.yml --syntax-check
+        
+        
+        
+        
+        ansible-playbook sshcopy.yml -vv
+        
+        =============25/22/2018================
+        =============web server install and start
+        ==================
+   
+---
+- hosts: all
+  user: root
+  become: true
+
+  vars:
+    pack_name: httpd
+    serv_name: httpd
+
+  tasks:
+    - name: Install {{ pack_name }}
+      yum: pkg={{ pack_name }} state=installed
+    - name: Starte {{ serv_name }}
+      service: name={{ serv_name }} state=started
+-----------------------------------
+---
+ hosts: all 
+  tasks: 
+  - name: Print the ansible_os_family value 
+    debug: 
+      msg: '{{ ansible_os_family }}' 
+  - name: Ensure the httpd package is updated 
+    yum: 
+      name: httpd 
+      state: latest 
+    become: True 
+    when: ansible_os_family == 'RedHat' 
+  - name: Ensure the apache2 package is updated 
+    apt: 
+      name: apache2 
+      state: latest 
+    become: True 
+    when: ansible_os_family == 'Debian'
+  - name: start service
+    service: name=httpd state=started
+    register: output_variable
+    become: yes
+  - debug:
+      msg: '{{ output_variable.state }}'
+     
+        
+---------------------------- ------------------------
+    
+2/Dec/2018 (GIT HUB)
+
+
+1. login to ansible controller machine 
+
+2. check if git is there "git --version"
+
+3. if not install it
+
+       yum install git –y
+
+4. mkdir –p /opt/devops
+
+5. run >> git init --- to initialize git repository
+
+6. go to /opt/devops
+
+7. [root@ip-172-31-18-105 devops]# cp -r /opt/ansible-demo/ .
+
+8. run >> git status
+       Will show all untracked files.
+
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#       ansible-demo/
+
+9. run >> “git add .”
+
+10. run >> git status
+       Will show all files to be commited
+# Changes to be committed:
+#   (use "git rm --cached <file>..." to unstage)
+#
+#       new file:   ansible-demo/apache.yml
+#       new file:   ansible-demo/apache_loop.yml
+#       new file:   ansible-demo/apache_process.yml
+#       new file:   ansible-demo/apache_start.yml
+#       new file:   ansible-demo/apache_start_web.yml
+#       new file:   ansible-demo/index.html.j2
+#       new file:   ansible-demo/ngnix.yml
+#       new file:   ansible-demo/sshcopy.yml
+
+
+11. run >> git commit –m”My First Commit”
+[master (root-commit) 8611271] My First Commit
+ Committer: root <root@ip-172-31-18-105.us-east-2.compute.internal>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 8 files changed, 133 insertions(+)
+ create mode 100644 ansible-demo/apache.yml
+ create mode 100644 ansible-demo/apache_loop.yml
+ create mode 100644 ansible-demo/apache_process.yml
+ create mode 100644 ansible-demo/apache_start.yml
+ create mode 100644 ansible-demo/apache_start_web.yml
+ create mode 100644 ansible-demo/index.html.j2
+ create mode 100644 ansible-demo/ngnix.yml
+ create mode 100644 ansible-demo/sshcopy.yml
+
+12. “git status”
+       Will show “nothing to commit, working directory clean”   
+      
+13. go to git hub > your repositories > new 
+
+14. from local repos(linux) run below >>
+“git remote add origin https://github.com/ruchisin/devops.git”
+
+There are two ways to add local repository from local to GitHub 
+a) Through https --- this will require to give user_name and pwd
+b) Through ssh (in above command we are using https method)
+
+14. run from linux : “git push -u origin master”
+It will ask for git hub user_name and password.
+
+15. verify from github you can see your devops directory contains in github.
+       
+
+----  Git clone from git hub to local system (windows)
+
+1.  Go to windowd dir “C:\personal_ruchi”
+2.  Right click “Git Bash Here”
+3.  Git bash console will open
+4.  Run >> “git clone https://github.com/ruchisin/devops.git”
+url taken from github >> devops >> Clone or Download 
+5.  from Git bash
+6.  cd devops
+7.  adding some file in devops folder in windows
+8.  Add this new file in git hub repository:
+  git add ansible-demo/Ansible.docx
+9.  git commit -m"commiting ansible document"
+this will show some error so need to run below commands
+
+
+10. Run below commands:
+    git config --global user.email "ruchisingh.june87@gmail.com"
+    git config --global user.name "ruchisin"
+   11.  run >> git commit -m"commiting ansible document"
+   12.  git push
+ ---------------------Python Django Application--------------------------------
+ 1.Create S3 Bucket
+  colibris3applicationsample (to be changed)
+2.Crete Iam role
+   Role Name: s3sampleapplicationec2
+           s3sampleapplicationec2
+           
+3. Create Ubuntu 16.04 machine with userdata.sh script
+   sudo apt-get update -y
+   sudo apt-get upgrade -y
+   sudo apt-get install -y python-pip python-dev build-essential
+   
+   
+    sudo pip install django==1.11 requests boto3 django-bootstrap3 pillow
+    django-admin.py startproject s3pythonapp
+    
+    git clone https://github.com/maheshkharwadkar/Django-Application.git    
+4. Add security group with Port 22,80
+
+5. Do SSH
+   scp -i "key path" source floder ubuntu@ip:/home/ubuntu/s3pythonapp
+   Copy s3pythonapp to /home/ubuntu/s3pythonapp
+
+    Changes in settings.py
+      1. change S3 Bucket Name
+        line no.- 91 : Change S3 bucket name
+      2. Change ELB DNS Name
+          line no.- 30 : ALLOWED_HOSTS = ["*"]
+      3. ALLOWED_HOSTS = ["*"]
+            line no.- 45 : Change ELB DNS Name
+  
+ 
+  
+    cd /etc/systemd/system/
+    sudo vi django.service
+    sudo systemctl start django.service
+    sudo systemctl enable django.service
+           
+6. Create AMI - s3ApplicationAMI
+
+
+7. Create Autoscaling Group
+     LC - s3ec2sampleapp
+          Role Name s3sampleapplicationec2
+     Select Security group- s3app
+     AG Name: s3ec2group
+     Give all the subnets in the region
+     Receive Traffic from one or more Load Balancer
+     Target Group- Ec2S3Group
+     Configure Auto Scaling Policies
+       Increase Group Size
+         CPU utilization >= 60% (uncheck send notification)
+       Decrease Group Size
+         <=30%
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+ 
+
+
+
+
+
